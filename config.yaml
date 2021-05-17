@@ -1,0 +1,15 @@
+bot_prefix: "~"
+admin: 209143819147542529
+create_channel_id: 811331713413414942 # ID of the "Create a VC!" channel
+ignore_pin_channels:
+  - 810214715610366002 # Welcome channel
+  - 824361378139078687 # Action-Log
+  - 810214725219909692 # Announcements
+  - 811325981377429594 # Role-Assign
+  - 811330973425336350 # Bot-Commands
+admin_channel_id: 810977650889588797
+server_id: 808838708702871564
+verified_role_id: 840401880550473728
+
+role_assign_channel_id: 811325981377429594
+verify_message_id: 841328188398239746
