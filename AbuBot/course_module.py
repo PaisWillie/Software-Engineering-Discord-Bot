@@ -33,3 +33,24 @@ class Course():
             name = course.text
             course_list.append(name)
         return course_list
+
+    def insert_course(self,course_name,description,hours,requirements):
+        course_dept, course_code = course_name.split()[:2]
+        conn = sqlite3.connect(db_file)
+        try:
+            cur = conn.cursor()
+            cur.execute(f"INSERT INTO {course_dept} VALUES ('{course_name}', {int(course_code[-1])}, '{description}', '{hours}', '{requirements}', '{course_code}')")
+            conn.commit()
+        except Error as e:
+            print(e)
+            return False
+        conn.close()
+        return True
+
+
+
+
+
+
+
+
