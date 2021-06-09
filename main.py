@@ -12,6 +12,7 @@ from AbuBot.course_cmds import GetCourses
 # from RoleAssign.role_assign import RoleAssign
 from PinMe.pin_me import PinMe
 from VerifyMe.verify_me import VerifyMe
+from AutoHeart.auto_heart import AutoHeart
 
 if not os.path.isfile("config.yaml"):
     sys.exit("'config.yaml' not found! Please add it and try again.")
@@ -68,6 +69,7 @@ bot.add_cog(GetCourses(bot=bot))
 bot.add_cog(PinMe(bot=bot, ignore_channels=config["ignore_pin_channels"],
                   admin_channel_id=config["admin_channel_id"], server_id=config["server_id"], verified_role_id=config["verified_role_id"]))
 bot.add_cog(VerifyMe(bot=bot, verify_message_id=config["verify_message_id"], verified_role_id=config["verified_role_id"], email_address=os.getenv('EMAIL_USER'), email_pass=os.getenv('EMAIL_PASS'), server_id=config["server_id"]))
+bot.add_cog(AutoHeart(bot=bot, introductions_channel_id=config["introductions_channel_id"]))
 
 # print(config["ignore_pin_channels"])
 
