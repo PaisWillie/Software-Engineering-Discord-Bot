@@ -118,7 +118,7 @@ class VerifyMe(commands.Cog):
 
                 if not data[mac_id]["discord_id"]:
 
-                    if self.check_otp(member=member, mac_id=mac_id, check=check):
+                    if await self.check_otp(member=member, mac_id=mac_id, check=check):
                         await member.send("Success!")
 
                 elif data[mac_id]["discord_id"] != member.id:
