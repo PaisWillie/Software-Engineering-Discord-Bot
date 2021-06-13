@@ -8,6 +8,8 @@ import smtplib
 from random import randint
 from email.message import EmailMessage
 
+from VerifyMe.database import Database
+
 from discord.ext import commands
 
 
@@ -89,14 +91,12 @@ class VerifyMe(commands.Cog):
         def check(message):
             return isinstance(message.channel, discord.channel.DMChannel) and message.author.id == member.id
 
-        if not os.path.isfile('VerifyMe/data.json'):
-            print("data.json file could not be found")
+        if not os.path.isfile('VerifyMe/users.db'):
+            print("users.db file could not be found")
             await member.send("An error has occured. Please contact an Administrator")
             return
 
-        # Reading data from JSON file
-        with open('VerifyMe/data.json', 'r') as file:
-            data = json.loads(file.read())
+        data = Database("VerifyMe/users.db")
 
         await member.send("Type in your MacID in chat:")
 
@@ -119,6 +119,8 @@ class VerifyMe(commands.Cog):
                 if not data[mac_id]["discord_id"]:
 
                     if await self.check_otp(member=member, mac_id=mac_id, check=check):
+                        # data[mac_id]["is_verified"] = 1
+                        # set other information ...
                         await member.send("Success!")
 
                 elif data[mac_id]["discord_id"] != member.id:
@@ -129,8 +131,4 @@ class VerifyMe(commands.Cog):
 
             else:
                 await member.send("MacID cannot be found, please re-type your MacID in chat:")
-                msg = None
 
-        # Writing data to JSON file
-        with open('VerifyMe/data.json', 'w') as file:
-            json.dump(data, file)
