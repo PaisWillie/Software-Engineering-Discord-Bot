@@ -5,6 +5,7 @@ class NQN(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    # FIXME: this method is very error-prone
     def parse_message(self, original_message):
         msg_has_emoji = False
 
@@ -27,13 +28,9 @@ class NQN(commands.Cog):
                     next_char = original_message[idx + len(server_emoji)]
                     server_emoji += next_char
                 
-                # print(original_message)
-                # print(server_emoji)
                 if server_emoji.endswith(">"):
-                    # print("HERE")
                     parts = server_emoji[1:-1].split(":")
                     if len(parts) == 3:
-                        # print(parts)
                         animated, emoji_name, emoji_id = parts
                         emoji = utils.get(self.bot.emojis, name = emoji_name)
                         if emoji and str(emoji) == server_emoji:
@@ -67,8 +64,6 @@ class NQN(commands.Cog):
                     parsed_message += char
             idx += 1
         
-        # print(original_message)
-        # print(parsed_message)
         return parsed_message if msg_has_emoji else None
 
 
