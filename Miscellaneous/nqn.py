@@ -33,9 +33,9 @@ class NQN(commands.Cog):
                     if len(parts) == 3:
                         animated, emoji_name, emoji_id = parts
                         emoji = utils.get(self.bot.emojis, name = emoji_name)
-                        if emoji and str(emoji) == server_emoji:
-                            idx += len(server_emoji)
-                            continue
+                        if emoji:
+                            if emoji_id == emoji.id or emoji_name == emoji.name:
+                                idx += len(server_emoji)
             
             if char == ':':
                 if not in_emoji:
