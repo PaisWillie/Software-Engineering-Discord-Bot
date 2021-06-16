@@ -1,12 +1,49 @@
 from discord.ext import commands
 from discord import utils, AllowedMentions
 
+import re
+
 class NQN(commands.Cog):
+
+    MD_SNIPPET = re.compile("(?<!`)(`+)(?!`)([\\s\\S]+?)(?<!`)\\1(?!`)")
+
     def __init__(self, bot):
         self.bot = bot
 
+    @staticmethod
+    def find_snippets(input_text : str):
+        '''
+        remove markdown single and triple back tick escaped code snippets
+        note: this method is perhaps not the most efficient, but for now works
+        
+        Returns:
+            list of tuples containing all pairs of indices of snippet matches
+        '''
+        
+        indices = []
+        start_idx = 0
+        while start_idx < len(input_text):
+            match = NQN.MD_SNIPPET.search(input_text, start_idx)
+            if not match:
+                break
+            
+            indices.append((match.start(), match.end()))
+            start_idx = match.end()
+        
+        return indices
+
+
     # FIXME: this method is very error-prone
-    def parse_message(self, original_message):
+    # perhaps regex could be used here as well?
+    def parse_message(self, original_message : str):
+        '''
+        parses a discord message (string) and replaces animated emoji
+        representations with the symbolic version 
+
+        Returns:
+            the modified message (string) if an emoji was found,
+            otherwise None
+        '''
         msg_has_emoji = False
 
         parsed_message = ""
@@ -16,8 +53,21 @@ class NQN(commands.Cog):
         idx = 0
         message_length = len(original_message)
 
+        code_snippet_indices = NQN.find_snippets(original_message)
+        num_snippets = len(code_snippet_indices)
+        current_snippet = 0
+
         while idx < message_length:
             char = original_message[idx]
+
+            # if a code snippet is encountered, skip parsing it entirely
+            if current_snippet < num_snippets:
+                snippet_start, snippet_end = code_snippet_indices[current_snippet]
+                if idx == snippet_start:
+                    current_snippet += 1
+                    parsed_message += original_message[snippet_start:snippet_end]
+                    idx += snippet_end - snippet_start
+                    continue
 
             # TODO: improve this check
             # worst case O(N^2) if something like '<' * 2000
