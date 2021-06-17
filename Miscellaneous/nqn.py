@@ -65,6 +65,9 @@ class NQN(commands.Cog):
                 snippet_start, snippet_end = code_snippet_indices[current_snippet]
                 if idx == snippet_start:
                     current_snippet += 1
+                    if in_emoji:
+                        parsed_message += original_message[start_idx:snippet_start]
+                        in_emoji = False
                     parsed_message += original_message[snippet_start:snippet_end]
                     idx += snippet_end - snippet_start
                     continue
@@ -114,6 +117,9 @@ class NQN(commands.Cog):
                     parsed_message += char
             idx += 1
         
+        if in_emoji:
+            parsed_message += original_message[start_idx:]
+
         return parsed_message if msg_has_emoji else None
 
 
