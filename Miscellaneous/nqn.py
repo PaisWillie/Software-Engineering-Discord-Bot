@@ -1,40 +1,47 @@
 from discord.ext import commands
 from discord import utils, AllowedMentions
 
-import re
+# new regex supports variable length look-behind
+# https://pypi.org/project/regex/
+import regex as re
+
+
+def matches(text : str, pattern : re.Pattern):
+    '''
+    find all instances of pattern expression matches within a string
+    
+    Args:
+        text: string to be parsed (the 'haystack')
+        pattern: compiled regex expression (the 'needle')
+    Returns:
+        list of all regex matches found
+    '''
+
+    def search():
+        start_idx = 0
+        while start_idx < len(text):
+            match = pattern.search(text, start_idx)
+            if not match:
+                break
+            
+            yield match
+            start_idx = match.end()
+    
+    return list(search())
+
 
 class NQN(commands.Cog):
 
+    # assume no custom emoji namespace collisions with default emojis
+    CUSTOM_EMOJI = re.compile("(?<!<a?):(\w+):(?!\d+>)")
+    # SERVER_EMOJI is unused for now, but could be useful later
+    SERVER_EMOJI = re.compile("(?<!\\\)<a?:(\w+):(\d+)>")
     MD_SNIPPET = re.compile("(?<!`)(`+)(?!`)([\\s\\S]+?)(?<!`)\\1(?!`)")
 
     def __init__(self, bot):
         self.bot = bot
 
-    @staticmethod
-    def find_snippets(input_text : str):
-        '''
-        remove markdown single and triple back tick escaped code snippets
-        note: this method is perhaps not the most efficient, but for now works
-        
-        Returns:
-            list of tuples containing all pairs of indices of snippet matches
-        '''
-        
-        indices = []
-        start_idx = 0
-        while start_idx < len(input_text):
-            match = NQN.MD_SNIPPET.search(input_text, start_idx)
-            if not match:
-                break
-            
-            indices.append((match.start(), match.end()))
-            start_idx = match.end()
-        
-        return indices
 
-
-    # FIXME: this method is very error-prone
-    # perhaps regex could be used here as well?
     def parse_message(self, original_message : str):
         '''
         parses a discord message (string) and replaces animated emoji
@@ -44,81 +51,69 @@ class NQN(commands.Cog):
             the modified message (string) if an emoji was found,
             otherwise None
         '''
-        msg_has_emoji = False
 
-        parsed_message = ""
-        
-        in_emoji = False
+        # O(n) time for each regex match search
+        # each expression can require up to O(2^m) space (m = expression size)
+        # but I don't suppose that's an issue
 
-        idx = 0
-        message_length = len(original_message)
+        emoji_matches = matches(original_message, NQN.CUSTOM_EMOJI)
+        if not emoji_matches:
+            # normal message; no need to continue
+            return None
 
-        code_snippet_indices = NQN.find_snippets(original_message)
-        num_snippets = len(code_snippet_indices)
+        snippet_matches = matches(original_message, NQN.MD_SNIPPET)
         current_snippet = 0
 
-        while idx < message_length:
-            char = original_message[idx]
+        parsed_message = ""
+        last_end_idx = 0
+        msg_has_emoji = False
 
-            # if a code snippet is encountered, skip parsing it entirely
-            if current_snippet < num_snippets:
-                snippet_start, snippet_end = code_snippet_indices[current_snippet]
-                if idx == snippet_start:
+        for emoji_match in emoji_matches:
+            emoji_start, emoji_end = emoji_match.span()
+
+            # handle situation where an emoji exists inside of a code snippet
+            if current_snippet < len(snippet_matches):
+                snippet_match = snippet_matches[current_snippet]
+                snippet_start, snippet_end = snippet_match.span()
+                
+                # catch up to current emoji, no other snippets matter
+                while snippet_end <= emoji_start:
                     current_snippet += 1
-                    if in_emoji:
-                        parsed_message += original_message[start_idx:snippet_start]
-                        in_emoji = False
-                    parsed_message += original_message[snippet_start:snippet_end]
-                    idx += snippet_end - snippet_start
+                    if current_snippet >= len(snippet_matches):
+                        break
+                    snippet_match = snippet_matches[current_snippet]
+                    snippet_start, snippet_end = snippet_match.span()
+                
+                if snippet_start < emoji_start and emoji_end < snippet_end:
+                    # emoji is inside of snippet, skip it and continue
+                    parsed_message += original_message[last_end_idx:snippet_end]
+                    last_end_idx = snippet_end
                     continue
 
-            # TODO: improve this check
-            # worst case O(N^2) if something like '<' * 2000
-            if char == '<':
-                server_emoji = "<"
-                next_char = char
-                while idx + len(server_emoji) < message_length and next_char != '>':
-                    next_char = original_message[idx + len(server_emoji)]
-                    server_emoji += next_char
-                
-                if server_emoji.endswith(">"):
-                    parts = server_emoji[1:-1].split(":")
-                    if len(parts) == 3:
-                        animated, emoji_name, emoji_id = parts
-                        emoji = utils.get(self.bot.emojis, name = emoji_name)
-                        if emoji:
-                            if emoji_id == emoji.id or emoji_name == emoji.name:
-                                idx += len(server_emoji)
+
+            parsed_message += original_message[last_end_idx:emoji_start]
+            last_end_idx = emoji_end
+
+            # unpack the single regex group (should be just the emoji name) since
+            # the only capture group in CUSTOM_EMOJI is the word between the colons
+            emoji_name, = emoji_match.groups()
             
-            if char == ':':
-                if not in_emoji:
-                    in_emoji = True
-                    start_idx = idx
-                else:
-                    in_emoji = False
-                    end_idx = idx
-                    
-                    if end_idx - start_idx < 2:
-                        in_emoji = True
-                        start_idx = idx
-                        parsed_message += char
-                    else:
-                        # get emoji name from message without colons
-                        emoji_name = original_message[start_idx + 1:end_idx]
-                        emoji = utils.get(self.bot.emojis, name = emoji_name)
-                        if emoji:
-                            msg_has_emoji = True
-                            parsed_message += str(emoji)
-                        else:
-                            parsed_message += ":" + emoji_name + ":"
-            
+            # find discord.Emoji object if it exists within any guild we have access to
+            emoji = utils.get(self.bot.emojis, name = emoji_name)
+            # TODO: emotes in guild should take priority in case of namespace collision
+            # currently this class doesn't have access to the guild, but here's what it would be
+            # emoji = utils.get(self.guild.emojis, name = emoji_name) or \
+            #         utils.get(self.bot.emojis, name = emoji_name)
+
+            if emoji:
+                msg_has_emoji = True
+                # emoji class dunder str method has format `<(a):name:id>`
+                parsed_message += str(emoji)
             else:
-                if not in_emoji:
-                    parsed_message += char
-            idx += 1
+                # couldn't find emoji, add it back as plain text
+                parsed_message += ":" + emoji_name + ":"
         
-        if in_emoji:
-            parsed_message += original_message[start_idx:]
+        parsed_message += original_message[last_end_idx:]
 
         return parsed_message if msg_has_emoji else None
 
@@ -136,6 +131,11 @@ class NQN(commands.Cog):
             if not webhook:
                 webhook = await message.channel.create_webhook(name = "NQN")
 
+            # TODO: 
+            # since mentions are not allowed here, some unusual behaviour might
+            # occur if a user mentions or replies to another user and then their
+            # message is deleted. Perhaps this should be accounted for...
+            # if those mentions were allowed, double pinging would be a problem
             await webhook.send(
                 parsed_message,
                 username = message.author.name,
