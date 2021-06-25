@@ -28,14 +28,16 @@ def prefixed_cog(cls : CogMeta) -> CogMeta:
     
     '''
 
-    class PrefixedCog(cls):
-        def __init__(self, prefix = default_prefix, *args, **kwargs):
-            if prefix not in available_prefixes:
-                raise ValueError("The specified prefix is not a allowed in config.bot_prefixes.")
-            super(PrefixedCog, self).__init__(*args, **kwargs)
-            self.prefix = prefix
+    cls_init = cls.__init__
+    def __init__(self, prefix = default_prefix, *args, **kwargs):
+        if prefix not in available_prefixes:
+            raise ValueError("The specified prefix is not a allowed in config.bot_prefixes.")
+        cls_init(self, *args, **kwargs)
+        self.prefix = prefix
 
-        async def cog_check(self, ctx):
-            return ctx.prefix == self.prefix
+    async def cog_check(self, ctx):
+        return ctx.prefix == self.prefix
 
-    return PrefixedCog
+    cls.__init__ = __init__
+    cls.cog_check = cog_check
+    return cls
