@@ -23,7 +23,7 @@ else:
         config = yaml.load(file, Loader=yaml.FullLoader)
 
 intents = discord.Intents().all()
-bot = Bot(command_prefix=config["bot_prefix"], intent=intents)
+bot = Bot(command_prefix=config["bot_prefixes"], intent=intents)
 
 
 @bot.event
@@ -67,7 +67,7 @@ async def on_message(message):
 load_dotenv()
 
 bot.add_cog(TempVoice(bot=bot, vc_channel=config["create_channel_id"]))
-bot.add_cog(GetCourses(bot=bot))
+bot.add_cog(GetCourses(bot=bot, prefix="."))
 bot.add_cog(PinMe(bot=bot, ignore_channels=config["ignore_pin_channels"],
                   admin_channel_id=config["admin_channel_id"], server_id=config["server_id"], verified_role_id=config["verified_role_id"]))
 bot.add_cog(VerifyMe(bot=bot, verify_message_id=config["verify_message_id"], verified_role_id=config["verified_role_id"], email_address=os.getenv('EMAIL_USER'), email_pass=os.getenv('EMAIL_PASS'), server_id=config["server_id"]))

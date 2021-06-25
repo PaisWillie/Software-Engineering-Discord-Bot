@@ -1,9 +1,11 @@
 import discord
 from AbuBot.course_module import Course
 from discord.ext import commands
+from addons.prefixed_cog import prefixed_cog
 
 course_mod = Course()
 
+@prefixed_cog
 class GetCourses(commands.Cog):
      def __init__(self, bot):
           self.bot = bot

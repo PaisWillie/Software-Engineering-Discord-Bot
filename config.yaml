@@ -1,4 +1,4 @@
-bot_prefix: "~"
+bot_prefixes: ["~", "."]
 admin: 209143819147542529
 create_channel_id: 811331713413414942 # ID of the "Create a VC!" channel
 ignore_pin_channels:

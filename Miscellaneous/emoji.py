@@ -3,11 +3,13 @@ import requests
 import io
 import re
 from discord.ext import commands
+from addons.prefixed_cog import prefixed_cog
 
 '''
 Forked from https://github.com/appu1232/Discord-Selfbot/blob/master/cogs/emoji.py
 '''
 
+@prefixed_cog
 class Emoji(commands.Cog):
 
     def __init__(self, bot) -> None:

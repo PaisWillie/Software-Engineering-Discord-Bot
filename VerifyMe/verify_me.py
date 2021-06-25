@@ -1,6 +1,5 @@
 import discord
 import asyncio
-import json
 import os
 import os.path
 import smtplib
@@ -11,8 +10,10 @@ from email.message import EmailMessage
 from VerifyMe.database import Database
 
 from discord.ext import commands
+from addons.prefixed_cog import prefixed_cog
 
 
+@prefixed_cog
 class VerifyMe(commands.Cog):
 
     def __init__(self, bot, verify_message_id, verified_role_id, email_address, email_pass, server_id) -> None:
