@@ -24,12 +24,12 @@ else:
         config = yaml.load(file, Loader=yaml.FullLoader)
 
 
-def create_message_without_attachment(to,
-                                      subject,
-                                      message_text_html,
-                                      message_text_plain,
-                                      bcc=[],
-                                      sender=config['support_email']):
+def create_message(to,
+                   subject,
+                   message_text_html,
+                   message_text_plain,
+                   bcc=[],
+                   sender="Software Engineering Bot <mcmastersoftwareengineering@gmail.com>"):
     """Create a message for an email, without an attachment.
 
     message_text_plain: The plain text of the email message.
