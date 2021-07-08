@@ -17,12 +17,15 @@ from email.mime.application import MIMEApplication
 
 from googleapiclient import errors
 
+from VerifyMe.Gmail.quickstart import CreateService
+
 if not os.path.isfile("config.yaml"):
     sys.exit("'config.yaml' not found! Please add it and try again.")
 else:
     with open("config.yaml") as file:
         config = yaml.load(file, Loader=yaml.FullLoader)
 
+service = CreateService()
 
 def create_message(to,
                    subject,
@@ -52,3 +55,22 @@ def create_message(to,
     body = {'raw': raw_message_no_attachment}
 
     return body
+
+
+def send_email(content) -> bool:
+    """
+    Sends email with given message
+
+    message: Dictionary with raw data of the email message to be sent
+
+    Returns:
+    True iff message was succesfully sent. Otherwise returns False.
+    """
+
+    try:
+        # Sends email out to customer via Gmail
+        service.users().messages().send(userId='me', body=content).execute()
+        return True
+    except errors.HttpError as error:
+        log('An error occurred: %s' % error)
+        return False
