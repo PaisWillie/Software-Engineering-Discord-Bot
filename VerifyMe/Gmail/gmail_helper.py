@@ -10,14 +10,11 @@ from typing import List
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.mime.image import MIMEImage
-from email.mime.audio import MIMEAudio
-from email.mime.base import MIMEBase
-from email.mime.application import MIMEApplication
 
 from googleapiclient import errors
 
 from VerifyMe.Gmail.quickstart import CreateService
+from Miscellaneous.util import log
 
 if not os.path.isfile("config.yaml"):
     sys.exit("'config.yaml' not found! Please add it and try again.")
