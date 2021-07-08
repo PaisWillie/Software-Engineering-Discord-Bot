@@ -1,2 +1,4 @@
 .env
 __pycache__
+VerifyMe/classlists
+VerifyMe/users.db
