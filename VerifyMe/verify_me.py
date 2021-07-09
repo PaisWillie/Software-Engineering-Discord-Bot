@@ -120,8 +120,12 @@ class VerifyMe(commands.Cog):
                 if not data[mac_id]["discord_id"]:
 
                     if await self.check_otp(member=member, mac_id=mac_id, check=check):
-                        # data[mac_id]["is_verified"] = 1
-                        # set other information ...
+                        data[mac_id]["is_verified"] = 1
+                        data[mac_id]["discord_name"] = str(member)
+                        data[mac_id]["discord_id"] = str(member.id)
+
+                        # TODO: update user's role in server
+
                         await member.send("Success!")
 
                 elif data[mac_id]["discord_id"] != member.id:
