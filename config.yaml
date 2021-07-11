@@ -10,6 +10,7 @@ ignore_pin_channels:
 admin_channel_id: 810977650889588797
 server_id: 808838708702871564
 verified_role_id: 840401880550473728
+unverified_role_id: 840630211812786226
 
 role_assign_channel_id: 811325981377429594
 verify_message_id: 841328188398239746

@@ -16,9 +16,10 @@ from addons.prefixed_cog import prefixed_cog
 @prefixed_cog
 class VerifyMe(commands.Cog):
 
-    def __init__(self, bot, verify_message_id, verified_role_id, email_address, email_pass, server_id) -> None:
+    def __init__(self, bot, verify_message_id, unverified_role_id, verified_role_id, email_address, email_pass, server_id) -> None:
         self.bot = bot
         self.verify_message_id = verify_message_id
+        self.unverified_role_id = unverified_role_id
         self.verified_role_id = verified_role_id
         self.email_address = email_address
         self.email_pass = email_pass
@@ -82,10 +83,11 @@ class VerifyMe(commands.Cog):
     async def verify_user(self, user):
 
         guild = self.bot.get_guild(self.server_id)
-        role = guild.get_role(self.verified_role_id)
+        verified_role = guild.get_role(self.verified_role_id)
+        unverified_role = guild.get_role(self.unverified_role_id)
         member = await guild.fetch_member(user.id)
 
-        if role in member.roles:
+        if verified_role in member.roles:
             await member.send("You're already verified! Please contact an Administrator if you believe your current roles are a mistake.")
             return
 
@@ -124,7 +126,9 @@ class VerifyMe(commands.Cog):
                         data[mac_id]["discord_name"] = str(member)
                         data[mac_id]["discord_id"] = str(member.id)
 
-                        # TODO: update user's role in server
+                        if unverified_role in member.roles:
+                            await member.remove_roles(unverified_role)
+                        await member.add_roles(verified_role)
 
                         await member.send("Success!")
 
