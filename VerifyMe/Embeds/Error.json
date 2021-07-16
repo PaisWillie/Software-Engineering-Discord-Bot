@@ -1,0 +1,21 @@
+{
+    "username": "Software Engineering",
+    "avatar_url": "https://i.imgur.com/D3E35OS.png",
+    "content": "",
+    "embeds": [
+        {
+            "title": "An error has occurred",
+            "color": 10710269,
+            "description": "Please contact a server Administrator.",
+            "timestamp": "",
+            "author": {},
+            "image": {},
+            "thumbnail": {},
+            "footer": {
+                "text": ""
+            },
+            "fields": []
+        }
+    ],
+    "components": []
+}
