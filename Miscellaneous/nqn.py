@@ -33,16 +33,30 @@ def matches(text : str, pattern : re.Pattern):
 class NQN(commands.Cog):
 
     # assume no custom emoji namespace collisions with default emojis
-    CUSTOM_EMOJI = re.compile("(?<!<a?):(\w+):(?!\d+>)")
+    CUSTOM_EMOJI = re.compile("((?<!<a?))?:(?P<name>\w+):(?(1)|(?!\d+>))")
     # SERVER_EMOJI is unused for now, but could be useful later
-    SERVER_EMOJI = re.compile("(?<!\\\)<a?:(\w+):(\d+)>")
+    SERVER_EMOJI = re.compile("(?<!\\\)<a?:(?P<name>\w+):(\d+)>")
     MD_SNIPPET = re.compile("(?<!`)(`+)(?!`)([\\s\\S]+?)(?<!`)\\1(?!`)")
 
     def __init__(self, bot):
         self.bot = bot
 
+    def get_emoji_repr(self, emoji_name : str) -> str:
+        '''
+        find discord.Emoji object if it exists within any guild we have access to
+        if it does exist, return the rendered string representation of it
+        assume only single bot instance guild rather than worry about name collision
 
-    def parse_message(self, original_message : str):
+        Returns:
+            discord emoji string representation if it exists in (any) guild,
+            otherwise None
+        '''
+        
+        # emoji class dunder str method has format `<(a):name:id>`
+        emoji = utils.get(self.bot.emojis, name = emoji_name)
+        return None if not emoji else str(emoji)
+
+    def parse_message(self, original_message : str) -> str:
         '''
         parses a discord message (string) and replaces animated emoji
         representations with the symbolic version 
@@ -94,21 +108,15 @@ class NQN(commands.Cog):
             parsed_message += original_message[last_end_idx:emoji_start]
             last_end_idx = emoji_end
 
-            # unpack the single regex group (should be just the emoji name) since
-            # the only capture group in CUSTOM_EMOJI is the word between the colons
-            emoji_name, = emoji_match.groups()
-            
-            # find discord.Emoji object if it exists within any guild we have access to
-            emoji = utils.get(self.bot.emojis, name = emoji_name)
-            # TODO: emotes in guild should take priority in case of namespace collision
-            # currently this class doesn't have access to the guild, but here's what it would be
-            # emoji = utils.get(self.guild.emojis, name = emoji_name) or \
-            #         utils.get(self.bot.emojis, name = emoji_name)
+            # emoji_match pattern should contain a named group called "name"
+            named_groups = emoji_match.groupdict()
+            assert "name" in named_groups
+            emoji_name = named_groups["name"]
+            emoji_repr = self.get_emoji_repr(emoji_name)
 
-            if emoji:
+            if emoji_repr:
                 msg_has_emoji = True
-                # emoji class dunder str method has format `<(a):name:id>`
-                parsed_message += str(emoji)
+                parsed_message += emoji_repr
             else:
                 # couldn't find emoji, add it back as plain text
                 parsed_message += ":" + emoji_name + ":"
