@@ -4,9 +4,10 @@ from discord import utils, AllowedMentions
 # new regex supports variable length look-behind
 # https://pypi.org/project/regex/
 import regex as re
+from typing import Optional
 
 
-def matches(text : str, pattern : re.Pattern):
+def matches(text : str, pattern):
     '''
     find all instances of pattern expression matches within a string
     
@@ -41,7 +42,7 @@ class NQN(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    def get_emoji_repr(self, emoji_name : str) -> str:
+    def get_emoji_repr(self, emoji_name : str) -> Optional[str]:
         '''
         find discord.Emoji object if it exists within any guild we have access to
         if it does exist, return the rendered string representation of it
@@ -56,7 +57,7 @@ class NQN(commands.Cog):
         emoji = utils.get(self.bot.emojis, name = emoji_name)
         return None if not emoji else str(emoji)
 
-    def parse_message(self, original_message : str) -> str:
+    def parse_message(self, original_message : str) -> Optional[str]:
         '''
         parses a discord message (string) and replaces animated emoji
         representations with the symbolic version 

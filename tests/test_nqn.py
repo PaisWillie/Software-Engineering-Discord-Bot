@@ -39,7 +39,7 @@ class TestNQN(TestCase):
     def test_with_message(self):
         self._test_parse_message("w :omegalul: w", "w <:omegalul:4159075138> w")
 
-    def test_case(self):
+    def test_emoji_case(self):
         self._test_parse_message(":pepeLaugh: :pepe_laugh:", "<:pepeLaugh:1234543210> <:pepe_laugh:9876543210>")
 
     def test_global_emoji(self): # assumes no server emote with same name
@@ -48,7 +48,7 @@ class TestNQN(TestCase):
     def test_emoji_in_markdown(self):
         self._test_parse_message("try typing `:drake:`", None)
 
-    def test_emoji_in_markdown(self):
+    def test_emoji_in_markdown_multi(self):
         self._test_parse_message("try typing ```:drake:```", None)
 
     def test_server_emote(self):

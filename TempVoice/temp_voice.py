@@ -5,7 +5,7 @@ class TempVoice(commands.Cog):
     def __init__(self, bot, vc_channel) -> None:
         self.bot = bot
         self.vc_channel = vc_channel
-        self.channels = []
+        self.channels : list[str] = []
 
     @commands.Cog.listener()
     async def on_voice_state_update(self,member, before, after):
@@ -13,8 +13,6 @@ class TempVoice(commands.Cog):
         await self.check_channels(member, before.channel, after.channel)
 
     async def create_channel(self, member, category):
-
-        global channels
 
         # Generates new group channel with group #
         new_channel = await category.create_voice_channel(f"{member.name}'s Channel")
