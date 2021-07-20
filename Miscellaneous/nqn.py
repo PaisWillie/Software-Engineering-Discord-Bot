@@ -147,7 +147,7 @@ class NQN(commands.Cog):
             # if those mentions were allowed, double pinging would be a problem
             await webhook.send(
                 parsed_message,
-                username = message.author.name,
+                username = message.author.nick if message.author.nick else message.author.name,
                 avatar_url = message.author.avatar_url,
                 allowed_mentions = AllowedMentions(
                     users = False,
