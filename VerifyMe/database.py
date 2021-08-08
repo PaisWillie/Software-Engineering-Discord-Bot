@@ -64,7 +64,7 @@ class Database:
     @staticmethod
     def create_db(path, users : list[tuple]):
         if os.path.isfile(path):
-            raise FileExistsError("DB file already exist at specified location")
+            raise FileExistsError("File \"{path}\" already exists")
 
         conn = sqlite3.connect(path)
         cur = conn.cursor()
@@ -78,7 +78,7 @@ class Database:
 
     def __init__(self, path):
         if not os.path.isfile(path):
-            raise FileNotFoundError("DB file does not exist at specified location")
+            raise FileNotFoundError(f"File \"{path}\" does not exist")
         self.path = path
         self.cache : dict[str, Database.User] = {}
 

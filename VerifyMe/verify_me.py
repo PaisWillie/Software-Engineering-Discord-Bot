@@ -10,8 +10,15 @@ from VerifyMe.database import Database
 from discord.ext import commands
 
 from addons.prefixed_cog import prefixed_cog
-from Miscellaneous.util import log, send_embeds
+from addons.embed_factory import EmbedFactory
+from Miscellaneous.util import log
 
+
+EMBED_GENERIC_ERROR = EmbedFactory.error()
+EMBED_MACID_ALREADY_REGISTERED = EmbedFactory.error(message=
+    "**This MacID is already registered to another Discord user.**\nPlease contact an Administrator if you believe this is a mistake.")
+EMBED_REQUEST_TIMED_OUT = EmbedFactory.error(message=
+    "**Your request has timed out**\nRestart the request by typing `~verify` in chat.")
 
 @prefixed_cog
 class VerifyMe(commands.Cog):
@@ -95,13 +102,12 @@ class VerifyMe(commands.Cog):
         def check(message):
             return isinstance(message.channel, discord.channel.DMChannel) and message.author.id == member.id
 
-        if not os.path.isfile('VerifyMe/users.db'):
-            log("users.db file could not be found")
-            # await member.send("An error has occured. Please contact an Administrator")
-            await send_embeds(ctx=member, file_path="VerifyMe/Embeds/Error.json")
+        try:
+            data = Database("VerifyMe/users.db")
+        except FileNotFoundError as e:
+            log(str(e))
+            await member.send(embed=EMBED_GENERIC_ERROR)
             return
-
-        data = Database("VerifyMe/users.db")
 
         await member.send("Type in your MacID in chat:")
 
@@ -112,7 +118,7 @@ class VerifyMe(commands.Cog):
             try:
                 user_input = await self.bot.wait_for('message', check=check, timeout=120.0)
             except asyncio.TimeoutError:
-                await send_embeds(ctx=member, file_path="VerifyMe/Embeds/Request_Timed_Out.json")
+                await member.send(embed=EMBED_REQUEST_TIMED_OUT)
                 return
 
             mac_id = user_input.content.lower()
@@ -135,7 +141,7 @@ class VerifyMe(commands.Cog):
                         await member.send("Success!")
 
                 elif data[mac_id]["discord_id"] != member.id:
-                    await send_embeds(ctx=member, file_path="VerifyMe/Embeds/MacID_Already_Registered.json")
+                    await member.send(embed=EMBED_MACID_ALREADY_REGISTERED)
                 elif data[mac_id]["discord_id"] == member.id:
                     # If MacID matches, but user does not have Verified role for some reason
                     pass
