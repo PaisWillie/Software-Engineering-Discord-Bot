@@ -6,6 +6,9 @@ from discord import utils, AllowedMentions
 import regex as re
 from typing import Optional
 
+from addons.prefixed_cog import prefixed_cog
+from addons.embed_factory import EmbedFactory
+
 
 def matches(text : str, pattern):
     '''
@@ -31,6 +34,7 @@ def matches(text : str, pattern):
     return list(search())
 
 
+@prefixed_cog
 class NQN(commands.Cog):
 
     # assume no custom emoji namespace collisions with default emojis
@@ -41,6 +45,17 @@ class NQN(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.command()
+    async def listnqn(self, ctx):
+        '''
+        send a message containing currently available NQN emotes
+        '''
+        server_emojis = set(ctx.guild.emojis)
+        all_emojis = sorted(self.bot.emojis, key=lambda x: x.name)
+        response = "".join(str(emoji) for emoji in all_emojis
+            if emoji not in server_emojis or emoji.animated)
+        await ctx.send(embed=EmbedFactory.info(title="NQN Emojis", message=response))
 
     def get_emoji_repr(self, emoji_name : str) -> Optional[str]:
         '''
