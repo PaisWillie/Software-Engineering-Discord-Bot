@@ -31,7 +31,7 @@ def prefixed_cog(cls : CogMeta) -> CogMeta:
     cls_init = cls.__init__
     def __init__(self, prefix = default_prefix, *args, **kwargs):
         if prefix not in available_prefixes:
-            raise ValueError("The specified prefix is not allowed in config.bot_prefixes.")
+            raise ValueError(f"The specified prefix \"{prefix}\" is not allowed in config.bot_prefixes.")
         cls_init(self, *args, **kwargs)
         self.prefix = prefix
 

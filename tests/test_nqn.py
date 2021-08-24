@@ -7,15 +7,15 @@ class TestNQN(TestCase):
 
     def setUp(self):
         def fake_get_emoji_repr(cog_ins, emoji_name : str):
-            return {
+            return {key.lower(): value for key, value in {
                     'sadge': '<:sadge:1234567890>',
                     'drake': '<a:drake:1234543210>',
                     'omegalul': '<:omegalul:4159075138>',
                     'pepeLaugh': '<:pepeLaugh:1234543210>',
                     'pepe_laugh': '<:pepe_laugh:9876543210>',
-                }.get(emoji_name)
+                }.items()}.get(emoji_name.lower())
         
-        self.cog_ins = nqn.NQN(None)
+        self.cog_ins = nqn.NQN(bot=None)
         self.patch = mock.patch.object(nqn.NQN, 'get_emoji_repr', fake_get_emoji_repr)
         self.patch.start()
 
@@ -41,6 +41,9 @@ class TestNQN(TestCase):
 
     def test_emoji_case(self):
         self._test_parse_message(":pepeLaugh: :pepe_laugh:", "<:pepeLaugh:1234543210> <:pepe_laugh:9876543210>")
+
+    def test_emoji_case_insens(self):
+        self._test_parse_message(":pepelaugh:", "<:pepeLaugh:1234543210>")
 
     def test_global_emoji(self): # assumes no server emote with same name
         self._test_parse_message("wow :flushed:", None)
