@@ -69,7 +69,7 @@ class NQN(commands.Cog):
         '''
         
         # emoji class dunder str method has format `<(a):name:id>`
-        emoji = utils.get(self.bot.emojis, name = emoji_name)
+        emoji = utils.find(lambda x: x.name.lower() == emoji_name.lower(), self.bot.emojis)
         return None if not emoji else str(emoji)
 
     def parse_message(self, original_message : str) -> Optional[str]:
