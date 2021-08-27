@@ -1,11 +1,11 @@
-from unittest import TestCase, mock
-import unittest
-from Miscellaneous import nqn
+from unittest import TestCase, main, mock
+from Miscellaneous.nqn import NQN
 
 
 class TestNQN(TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         def fake_get_emoji_repr(cog_ins, emoji_name : str):
             return {key.lower(): value for key, value in {
                     'sadge': '<:sadge:1234567890>',
@@ -15,12 +15,13 @@ class TestNQN(TestCase):
                     'pepe_laugh': '<:pepe_laugh:9876543210>',
                 }.items()}.get(emoji_name.lower())
         
-        self.cog_ins = nqn.NQN(bot=None)
-        self.patch = mock.patch.object(nqn.NQN, 'get_emoji_repr', fake_get_emoji_repr)
-        self.patch.start()
+        cls.cog_ins = NQN(bot=None)
+        cls.patch = mock.patch.object(NQN, 'get_emoji_repr', fake_get_emoji_repr)
+        cls.patch.start()
 
-    def tearDown(self):
-        self.patch.stop()
+    @classmethod
+    def tearDownClass(cls):
+        cls.patch.stop()
 
     def _test_parse_message(self, original_message, expected_message):
         parsed_message = self.cog_ins.parse_message(original_message)
@@ -83,7 +84,6 @@ class TestNQN(TestCase):
 :sadge::sadge:``````:drak```e<:omegalul:4159075138>""")
 
 
-# run test suite via
 # python3 -m unittest tests/test_nqn.py -v
 if __name__ == '__main__':
-    unittest.main()
+    main()

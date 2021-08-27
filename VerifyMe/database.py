@@ -51,20 +51,19 @@ class Database:
             self.database.cache[self[entry_key]] = self
 
     @staticmethod
-    def from_classlist(filepath, stream) -> list[UserData]:
+    def from_classlist(path, stream : str) -> list[UserData]:
         users = []
-        with open(filepath, "r", newline='') as csv_in:
+        with open(path, "r", newline='') as csv_in:
             reader = csv.reader(csv_in, delimiter=',', quotechar="\"")
             for _image, full_name, macid, role in reader:
                 is_TA = int(role != "Student")
                 users.append(Database.UserData.new(macid, full_name, stream, is_TA))
-
         return users
 
     @staticmethod
     def create_db(path, users : list[tuple]):
         if os.path.isfile(path):
-            raise FileExistsError("File \"{path}\" already exists")
+            raise FileExistsError(f"File \"{path}\" already exists")
 
         conn = sqlite3.connect(path)
         cur = conn.cursor()
@@ -106,14 +105,18 @@ class Database:
 
 
 def main():
-    Database.create_db("VerifyMe/users.db", list(set(
-        Database.from_classlist("VerifyMe/classlists/2DA4.csv", "Software") +
-        Database.from_classlist("VerifyMe/classlists/2GA3.csv", "Software")
-    )))
-
-    # TODO: write unittest for database
-    # db = Database("VerifyMe/users.db")
-    # ...
+    cwd = os.path.dirname(__file__)
+    classlists = os.path.join(cwd, "classlists")
+    Database.create_db(
+        path=os.path.join(cwd, "users.db"),
+        users=list(set(
+            Database.from_classlist(
+                path=os.path.join(classlists, "2DA4.csv"),
+                stream="Software") +
+            Database.from_classlist(
+                path=os.path.join(classlists, "2GA3.csv"),
+                stream="Software")
+        )))
 
 if __name__ == '__main__':
     main()
