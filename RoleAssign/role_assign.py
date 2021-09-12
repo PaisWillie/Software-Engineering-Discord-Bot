@@ -5,12 +5,17 @@ from discord.raw_models import RawReactionActionEvent
 
 class RoleAssign(commands.Cog):
 
-    def __init__(self, bot, role_assign_message: int, role_assign_channel: int, emoji_ids, admin_id) -> None:
+    def __init__(self, bot, role_assign_message: int, role_assign_channel: int, emoji_ids, admin_id: int, stream_message_id: int, specialty_message_id: int, miscellaneous_message_id: int) -> None:
         self.bot = bot
         self.role_assign_message = role_assign_message
         self.emoji_ids = emoji_ids
         self.role_assign_channel = role_assign_channel
         self.admin_id = admin_id
+
+        # TODO: Add message IDs for stream, specialties, misc, 
+        self.stream_message_id = stream_message_id
+        self.specialty_message_id = specialty_message_id
+        self.miscellaneous_message_id = miscellaneous_message_id
 
     # TODO: Check for unverified and verified roles
     # TODO: Prevent verified roles from reacting and unreacting to lose role
@@ -35,12 +40,12 @@ class RoleAssign(commands.Cog):
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
 
-        # TO-DO: Check if verified, if so, remove reaction and return None
+        # TODO: Check if verified, if so, remove reaction and return None
 
         if (payload.message_id != self.role_assign_message) or (
                 payload.user_id == self.bot.user.id):
             return
-        # TO-DO: Remove CheckMark when verification is implemented
+        # TODO: Remove CheckMark when verification is implemented
         blanks = ["BlankI", "BlankII", "BlankIII", "CheckMark"]
         streams = ['SE', 'CE']
         specialties = ['MG', 'SC', 'BM']
@@ -49,7 +54,7 @@ class RoleAssign(commands.Cog):
         guild = self.bot.get_guild(payload.guild_id)
         member = await guild.fetch_member(payload.user_id)
 
-        # TO-DO: If reacted a blank, remove reaction and return None
+        # TODO: If reacted a blank, remove reaction and return None
         if payload.emoji.name in blanks:
             channel = self.bot.get_channel(payload.channel_id)
             message = await channel.fetch_message(payload.message_id)
@@ -160,7 +165,7 @@ class RoleAssign(commands.Cog):
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
 
-        # TO-DO: Check if verified, if so, add reaction back and return None
+        # TODO: Check if verified, if so, add reaction back and return None
 
         if payload.message_id != self.role_assign_message:
             return
