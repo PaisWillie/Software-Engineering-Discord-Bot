@@ -12,6 +12,9 @@ class RoleAssign(commands.Cog):
         self.role_assign_channel = role_assign_channel
         self.admin_id = admin_id
 
+    # TODO: Check for unverified and verified roles
+    # TODO: Prevent verified roles from reacting and unreacting to lose role
+
     @commands.command()
     async def setuproles(self, ctx):
 
