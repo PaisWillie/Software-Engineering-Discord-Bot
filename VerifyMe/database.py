@@ -115,6 +115,15 @@ def main():
                 stream="Software") +
             Database.from_classlist(
                 path=os.path.join(classlists, "2GA3.csv"),
+                stream="Software") +
+            Database.from_classlist(
+                path=os.path.join(classlists, "2DM3.csv"),
+                stream="Software") +
+            Database.from_classlist(
+                path=os.path.join(classlists, "2OP3.csv"),
+                stream="Software") +
+            Database.from_classlist(
+                path=os.path.join(classlists, "2XC3.csv"),
                 stream="Software")
         )))
 

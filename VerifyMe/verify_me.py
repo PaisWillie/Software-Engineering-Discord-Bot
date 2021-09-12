@@ -3,6 +3,7 @@ import asyncio
 import os
 import os.path
 import smtplib
+from enum import Enum
 
 from random import randint
 from email.message import EmailMessage
@@ -17,8 +18,17 @@ from Miscellaneous.util import log
 EMBED_GENERIC_ERROR = EmbedFactory.error()
 EMBED_MACID_ALREADY_REGISTERED = EmbedFactory.error(message=
     "**This MacID is already registered to another Discord user.**\nPlease contact an Administrator if you believe this is a mistake.")
+EMBED_TOO_MANY_TRIES = EmbedFactory.error(message=
+    "**Failed too many times.**\nRestart the request by typing `~verify` in chat.")
 EMBED_REQUEST_TIMED_OUT = EmbedFactory.error(message=
     "**Your request has timed out**\nRestart the request by typing `~verify` in chat.")
+EMBED_OTP_FAIL = EmbedFactory.error(message=
+    "**Failed to match OTP, try again.**\nRestart the request by typing `~verify` in chat.")
+
+class OTP_RESULT(Enum):
+    SUCCESS = 0
+    TIMEOUT = 1
+    TOO_MANY = 2
 
 @prefixed_cog
 class VerifyMe(commands.Cog):
@@ -72,21 +82,21 @@ class VerifyMe(commands.Cog):
 
         await member.send(f"A one-time verification code has been emailed to you at `{mac_id}@mcmaster.ca`. Ensure you check your spam folder. Please type it in chat:")
 
-        user_input = None
-
-        while not user_input:
-
+        max_tries = 3
+        for num_tries in range(1, max_tries+1):
             try:
                 user_input = await self.bot.wait_for('message', check=check, timeout=300.0)
             except asyncio.TimeoutError:
-                await member.send("Your request has timed out. Restart the request by typing `~verify` in chat.")
-                return
+                return OTP_RESULT.TIMEOUT
 
             if user_input.content != OTP:
-                await member.send("Invalid input, please check your code again and type it in chat:")
-                msg = None
+                if num_tries != max_tries:
+                    await member.send("Invalid input, please check your code again and type it in chat:")
+            else:
+                # verification should occur
+                return OTP_RESULT.SUCCESS
 
-        return True
+        return OTP_RESULT.TOO_MANY
 
     async def verify_user(self, user):
 
@@ -111,40 +121,62 @@ class VerifyMe(commands.Cog):
 
         await member.send("Type in your MacID in chat:")
 
-        user_input = None
-
-        while not user_input:
+        max_tries = 5
+        for num_tries in range(1, max_tries+1):
 
             try:
                 user_input = await self.bot.wait_for('message', check=check, timeout=120.0)
             except asyncio.TimeoutError:
                 await member.send(embed=EMBED_REQUEST_TIMED_OUT)
-                return
+                break
 
             mac_id = user_input.content.lower()
 
+            # user exists in the database
             if mac_id in data:
 
-                # await member.send("MacID found!")
-
+                # database entry does not have an associated discord account
                 if not data[mac_id]["discord_id"]:
 
-                    if await self.check_otp(member=member, mac_id=mac_id, check=check):
+                    verify_result = await self.check_otp(member=member, mac_id=mac_id, check=check)
+                    if verify_result == OTP_RESULT.SUCCESS:
+
+                        # actual verification of user happens here
+                        # if the server and database become out of sync (perhaps by
+                        # manually updating one but not the other), problems may occur
+
+                        # in database
                         data[mac_id]["is_verified"] = 1
                         data[mac_id]["discord_name"] = str(member)
                         data[mac_id]["discord_id"] = str(member.id)
-
+                        # in server
                         if unverified_role in member.roles:
                             await member.remove_roles(unverified_role)
                         await member.add_roles(verified_role)
 
+                        # TODO: add other stream specific roles
+
                         await member.send("Success!")
+
+                    else:
+                        if verify_result == OTP_RESULT.TIMEOUT:
+                            await member.send(embed=EMBED_REQUEST_TIMED_OUT)
+                        elif verify_result == OTP_RESULT.TOO_MANY:
+                            await member.send(embed=EMBED_OTP_FAIL)
 
                 elif data[mac_id]["discord_id"] != member.id:
                     await member.send(embed=EMBED_MACID_ALREADY_REGISTERED)
                 elif data[mac_id]["discord_id"] == member.id:
                     # If MacID matches, but user does not have Verified role for some reason
-                    pass
+                    log(f"{mac_id} tried to verify, but discord id belongs to {member_id}")
+                    await member.send(embed=EMBED_GENERIC_ERROR)
+                
+                return
 
             else:
-                await member.send("MacID cannot be found, please re-type your MacID in chat:")
+                if num_tries != max_tries:
+                    await member.send("MacID cannot be found, please re-type your MacID in chat:")
+        
+        else:
+            # if got here, didn't break out of loop
+            await member.send(embed=EMBED_TOO_MANY_TRIES)
