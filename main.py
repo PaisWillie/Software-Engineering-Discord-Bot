@@ -82,9 +82,6 @@ emoji_ids = {'SE': config["se_emoji_id"],
              'BM': config["bm_emoji_id"],
              'UP': config["up_emoji_id"],
              'TA': config["ta_emoji_id"],
-             "BlankI": config["blank_1_id"],
-             "BlankII": config["blank_2_id"],
-             "BlankIII": config["blank_3_id"],
              "CheckMark": config["check_mark_id"], }
 bot.add_cog(RoleAssign(
     bot=bot,
