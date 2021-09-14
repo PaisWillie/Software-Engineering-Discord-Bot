@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 from TempVoice.temp_voice import TempVoice
 from AbuBot.course_cmds import GetCourses
-# from RoleAssign.role_assign import RoleAssign
+from RoleAssign.role_assign import RoleAssign
 from PinMe.pin_me import PinMe
 from VerifyMe.verify_me import VerifyMe
 from Miscellaneous.auto_heart import AutoHeart
@@ -75,22 +75,22 @@ bot.add_cog(AutoHeart(bot=bot, introductions_channel_id=config["introductions_ch
 bot.add_cog(Emoji(bot=bot))
 bot.add_cog(NQN(bot=bot))
 
-# emoji_ids = {'SE': config["se_emoji_id"],
-#              'CE': config["ce_emoji_id"],
-#              'MG': config["mg_emoji_id"],
-#              'SC': config["sc_emoji_id"],
-#              'BM': config["bm_emoji_id"],
-#              'UP': config["up_emoji_id"],
-#              'TA': config["ta_emoji_id"],
-#              "BlankI": config["blank_1_id"],
-#              "BlankII": config["blank_2_id"],
-#              "BlankIII": config["blank_3_id"],
-#              "CheckMark": config["check_mark_id"], }
-# bot.add_cog(RoleAssign(
-#     bot=bot,
-#     role_assign_message=config["role_assign_message_id"],
-#     role_assign_channel=config["role_assign_channel_id"],
-#     emoji_ids=emoji_ids,
-#     admin_id=config["admin"]))
+emoji_ids = {'SE': config["se_emoji_id"],
+             'CE': config["ce_emoji_id"],
+             'MG': config["mg_emoji_id"],
+             'SC': config["sc_emoji_id"],
+             'BM': config["bm_emoji_id"],
+             'UP': config["up_emoji_id"],
+             'TA': config["ta_emoji_id"],
+             "BlankI": config["blank_1_id"],
+             "BlankII": config["blank_2_id"],
+             "BlankIII": config["blank_3_id"],
+             "CheckMark": config["check_mark_id"], }
+bot.add_cog(RoleAssign(
+    bot=bot,
+    role_assign_message=config["role_assign_message_id"],
+    role_assign_channel=config["role_assign_channel_id"],
+    emoji_ids=emoji_ids,
+    admin_id=config["admin"]))
 
 bot.run(os.getenv('BOT_TOKEN'))

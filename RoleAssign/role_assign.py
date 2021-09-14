@@ -1,21 +1,35 @@
 import discord
 from discord.ext import commands
 from discord.raw_models import RawReactionActionEvent
+from typing import List
 
 
 class RoleAssign(commands.Cog):
 
-    def __init__(self, bot, role_assign_message: int, role_assign_channel: int, emoji_ids, admin_id: int, stream_message_id: int, specialty_message_id: int, miscellaneous_message_id: int) -> None:
+    def __init__(self, bot,
+                 role_assign_channel: int,
+                 emoji_ids, admin_id: int,
+                 stream_emoji_ids: List[int],
+                 specialty_emoji_ids: List[int],
+                 misc_emoji_ids: List[int],
+                 stream_message_id: int,
+                 specialty_message_id: int,
+                 miscellaneous_message_id: int
+                 ) -> None:
         self.bot = bot
-        self.role_assign_message = role_assign_message
+        # self.role_assign_message = role_assign_message
         self.emoji_ids = emoji_ids
         self.role_assign_channel = role_assign_channel
         self.admin_id = admin_id
 
-        # TODO: Add message IDs for stream, specialties, misc, 
+        # TODO: Add message IDs for stream, specialties, misc,
         self.stream_message_id = stream_message_id
         self.specialty_message_id = specialty_message_id
         self.miscellaneous_message_id = miscellaneous_message_id
+
+        self.stream_emoji_ids = stream_emoji_ids
+        self.specialty_emoji_ids = specialty_emoji_ids
+        self.misc_emoji_ids = misc_emoji_ids
 
     # TODO: Check for unverified and verified roles
     # TODO: Prevent verified roles from reacting and unreacting to lose role
@@ -54,13 +68,20 @@ class RoleAssign(commands.Cog):
         guild = self.bot.get_guild(payload.guild_id)
         member = await guild.fetch_member(payload.user_id)
 
-        # TODO: If reacted a blank, remove reaction and return None
-        if payload.emoji.name in blanks:
-            channel = self.bot.get_channel(payload.channel_id)
-            message = await channel.fetch_message(payload.message_id)
-            emoji = self.bot.get_emoji(self.emoji_ids[payload.emoji.name])
-            user = await self.bot.fetch_user(payload.user_id)
+        verified_role = discord.utils.get(
+            guild.roles, name="✔️")
 
+        channel = self.bot.get_channel(payload.channel_id)
+        emoji = self.bot.get_emoji(self.emoji_ids[payload.emoji.name])
+        user = await self.bot.fetch_user(payload.user_id)
+        message = await channel.fetch_message(payload.message_id)
+
+        # If member has verified roles, prevent action; remove reaction and don't do anything
+        if verified_role in member.roles:
+            await message.remove_reaction(emoji, user)
+
+        # If reacted a blank, remove reaction and return None
+        elif payload.emoji.name in blanks:
             await message.remove_reaction(emoji, user)
 
         elif payload.emoji.name in streams:
@@ -181,7 +202,22 @@ class RoleAssign(commands.Cog):
                       'UP': "Upper Year",
                       'TA': "TA"}
 
-        if payload.emoji.name in role_names:
+        guild = self.bot.get_guild(payload.guild_id)
+        member = await guild.fetch_member(payload.user_id)
+
+        verified_role = discord.utils.get(
+            guild.roles, name="❌")
+
+        channel = self.bot.get_channel(payload.channel_id)
+        emoji = self.bot.get_emoji(self.emoji_ids[payload.emoji.name])
+        user = await self.bot.fetch_user(payload.user_id)
+        message = await channel.fetch_message(payload.message_id)
+
+        # If member has verified roles, prevent action, re-add reaction and don't do anything
+        if verified_role in member.roles:
+            await message.add_reaction(emoji, user)
+
+        elif payload.emoji.name in role_names:
 
             guild = self.bot.get_guild(payload.guild_id)
             member = await guild.fetch_member(payload.user_id)
