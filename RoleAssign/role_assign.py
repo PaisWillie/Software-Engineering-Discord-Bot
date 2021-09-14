@@ -9,12 +9,13 @@ class RoleAssign(commands.Cog):
     def __init__(self, bot,
                  role_assign_channel: int,
                  emoji_ids, admin_id: int,
-                 stream_emoji_ids: List[int],
-                 specialty_emoji_ids: List[int],
-                 misc_emoji_ids: List[int],
+                 #  stream_emoji_ids: List[int],
+                 #  specialty_emoji_ids: List[int],
+                 #  misc_emoji_ids: List[int],
                  stream_message_id: int,
                  specialty_message_id: int,
-                 miscellaneous_message_id: int
+                 misc_message_id: int,
+                 verify_message_id: int
                  ) -> None:
         self.bot = bot
         # self.role_assign_message = role_assign_message
@@ -24,11 +25,12 @@ class RoleAssign(commands.Cog):
 
         self.stream_message_id = stream_message_id
         self.specialty_message_id = specialty_message_id
-        self.miscellaneous_message_id = miscellaneous_message_id
+        self.misc_message_id = misc_message_id
+        self.verify_message_id = verify_message_id
 
-        self.stream_emoji_ids = stream_emoji_ids
-        self.specialty_emoji_ids = specialty_emoji_ids
-        self.misc_emoji_ids = misc_emoji_ids
+        # self.stream_emoji_ids = stream_emoji_ids
+        # self.specialty_emoji_ids = specialty_emoji_ids
+        # self.misc_emoji_ids = misc_emoji_ids
 
     # TODO: Check for unverified and verified roles
     # TODO: Prevent verified roles from reacting and unreacting to lose role
@@ -40,15 +42,25 @@ class RoleAssign(commands.Cog):
             return
 
         channel = self.bot.get_channel(self.role_assign_channel)
-        message = await channel.fetch_message(self.role_assign_message)
 
-        setup_emojis = ('SE', 'CE', "BlankI", 'MG', 'SC',
-                        'BM', "BlankII", 'UP', 'TA', "BlankIII", "CheckMark")
+        setup_emojis_names = ('SE', 'CE', "BlankI", 'MG', 'SC',
+                              'BM', "BlankII", 'UP', 'TA', "BlankIII", "CheckMark")
 
-        for emoji_name in setup_emojis:
+        setup_emojis_names = {
+            self.stream_message_id: ('SE', 'CE', 'ME'),
+            self.specialty_message_id: ('MG', 'SC', 'BM'),
+            self.misc_message_id: ('UP', 'TA'),
+            self.verify_message_id: ('CheckMark')
+        }
 
-            emoji = self.bot.get_emoji(self.emoji_ids[emoji_name])
-            await message.add_reaction(emoji)
+        for message_id in setup_emojis_names:
+
+            message = await channel.fetch_message(message_id)
+
+            for emoji_name in setup_emojis_names[message_id]:
+
+                emoji = self.bot.get_emoji(self.emoji_ids[emoji_name])
+                await message.add_reaction(emoji)
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
@@ -68,7 +80,7 @@ class RoleAssign(commands.Cog):
         member = await guild.fetch_member(payload.user_id)
 
         verified_role = discord.utils.get(
-            guild.roles, name="✔️")
+            guild.roles, name="CheckMark")
 
         channel = self.bot.get_channel(payload.channel_id)
         emoji = self.bot.get_emoji(self.emoji_ids[payload.emoji.name])

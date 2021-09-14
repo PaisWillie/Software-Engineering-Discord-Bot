@@ -70,22 +70,31 @@ bot.add_cog(TempVoice(bot=bot, vc_channel=config["create_channel_id"]))
 bot.add_cog(GetCourses(bot=bot, prefix="."))
 bot.add_cog(PinMe(bot=bot, ignore_channels=config["ignore_pin_channels"],
                   admin_channel_id=config["admin_channel_id"], server_id=config["server_id"], verified_role_id=config["verified_role_id"]))
-bot.add_cog(VerifyMe(bot=bot, verify_message_id=config["verify_message_id"], unverified_role_id=config["unverified_role_id"], verified_role_id=config["verified_role_id"], email_address=os.getenv('EMAIL_USER'), email_pass=os.getenv('EMAIL_PASS'), server_id=config["server_id"]))
-bot.add_cog(AutoHeart(bot=bot, introductions_channel_id=config["introductions_channel_id"]))
+bot.add_cog(VerifyMe(bot=bot, verify_message_id=config["verify_message_id"], unverified_role_id=config["unverified_role_id"],
+            verified_role_id=config["verified_role_id"], email_address=os.getenv('EMAIL_USER'), email_pass=os.getenv('EMAIL_PASS'), server_id=config["server_id"]))
+bot.add_cog(AutoHeart(
+    bot=bot, introductions_channel_id=config["introductions_channel_id"]))
 bot.add_cog(Emoji(bot=bot))
 bot.add_cog(NQN(bot=bot))
 
 emoji_ids = {'SE': config["se_emoji_id"],
              'CE': config["ce_emoji_id"],
+             'ME': config["me_emoji_id"],
              'MG': config["mg_emoji_id"],
              'SC': config["sc_emoji_id"],
              'BM': config["bm_emoji_id"],
              'UP': config["up_emoji_id"],
              'TA': config["ta_emoji_id"],
              "CheckMark": config["check_mark_id"], }
+
 bot.add_cog(RoleAssign(
     bot=bot,
-    role_assign_message=config["role_assign_message_id"],
+    
+    specialty_message_id=config[""],
+    stream_message_id=config[""],
+    misc_message_id=config[""],
+    verify_message_id=config[""],
+
     role_assign_channel=config["role_assign_channel_id"],
     emoji_ids=emoji_ids,
     admin_id=config["admin"]))
