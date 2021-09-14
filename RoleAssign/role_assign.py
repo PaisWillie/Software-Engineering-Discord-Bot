@@ -22,7 +22,6 @@ class RoleAssign(commands.Cog):
         self.role_assign_channel = role_assign_channel
         self.admin_id = admin_id
 
-        # TODO: Add message IDs for stream, specialties, misc,
         self.stream_message_id = stream_message_id
         self.specialty_message_id = specialty_message_id
         self.miscellaneous_message_id = miscellaneous_message_id
