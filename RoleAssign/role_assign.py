@@ -70,7 +70,7 @@ class RoleAssign(commands.Cog):
         if (payload.message_id != self.role_assign_message) or (
                 payload.user_id == self.bot.user.id):
             return
-        # TODO: Remove CheckMark when verification is implemented
+
         blanks = ["BlankI", "BlankII", "BlankIII", "CheckMark"]
         streams = ['SE', 'CE']
         specialties = ['MG', 'SC', 'BM']
