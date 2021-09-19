@@ -9,8 +9,17 @@ ignore_pin_channels:
   - 811330973425336350 # Bot-Commands
 admin_channel_id: 810977650889588797
 server_id: 808838708702871564
+
 verified_role_id: 840401880550473728
 unverified_role_id: 840630211812786226
+software_role_id: 811655601079320608
+computer_role_id: 839543910917210192
+mechatronics_role_id: 852208372488601602
+management_role_id: 834152407243161690
+society_role_id: 834152432191275018
+biomedical_role_id: 834152549685919764
+upper_year_role_id: 838871312305750047
+TA_role_id: 840665145641402448
 
 role_assign_channel_id: 811325981377429594
 verify_message_id: 841328188398239746
@@ -19,6 +28,7 @@ introductions_channel_id: 811329517184221194
 
 se_emoji_id: -1
 ce_emoji_id: -1
+me_emoji_id: -1
 mg_emoji_id: -1
 sc_emoji_id: -1
 bm_emoji_id: -1

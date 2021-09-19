@@ -71,7 +71,15 @@ bot.add_cog(GetCourses(bot=bot, prefix="."))
 bot.add_cog(PinMe(bot=bot, ignore_channels=config["ignore_pin_channels"],
                   admin_channel_id=config["admin_channel_id"], server_id=config["server_id"], verified_role_id=config["verified_role_id"]))
 bot.add_cog(VerifyMe(bot=bot, verify_message_id=config["verify_message_id"], unverified_role_id=config["unverified_role_id"],
-            verified_role_id=config["verified_role_id"], email_address=os.getenv('EMAIL_USER'), email_pass=os.getenv('EMAIL_PASS'), server_id=config["server_id"]))
+            verified_role_id=config["verified_role_id"], email_address=os.getenv('EMAIL_USER'), email_pass=os.getenv('EMAIL_PASS'), server_id=config["server_id"],
+            software_role_id=config["software_role_id"],
+            computer_role_id=config["computer_role_id"],
+            mechatronics_role_id=config["mechatronics_role_id"],
+            management_role_id=config["management_role_id"],
+            society_role_id=config["society_role_id"],
+            biomedical_role_id=config["biomedical_role_id"],
+            upper_year_role_id=config["upper_year_role_id"],
+            TA_role_id=config["TA_role_id"]))
 bot.add_cog(AutoHeart(
     bot=bot, introductions_channel_id=config["introductions_channel_id"]))
 bot.add_cog(Emoji(bot=bot))

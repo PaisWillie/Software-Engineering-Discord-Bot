@@ -33,7 +33,9 @@ class OTP_RESULT(Enum):
 @prefixed_cog
 class VerifyMe(commands.Cog):
 
-    def __init__(self, bot, verify_message_id, unverified_role_id, verified_role_id, email_address, email_pass, server_id) -> None:
+    # TODO(Willie): pretty print this argument list for me pls
+    def __init__(self, bot, verify_message_id, unverified_role_id, verified_role_id, email_address, email_pass, server_id,
+                 software_role_id, computer_role_id, mechatronics_role_id, management_role_id, society_role_id, biomedical_role_id, upper_year_role_id, TA_role_id) -> None:
         self.bot = bot
         self.verify_message_id = verify_message_id
         self.unverified_role_id = unverified_role_id
@@ -41,6 +43,18 @@ class VerifyMe(commands.Cog):
         self.email_address = email_address
         self.email_pass = email_pass
         self.server_id = server_id
+        self.stream_ids = {
+            "Software": software_role_id,
+            "Computer": computer_role_id,
+            "Mechatronics": mechatronics_role_id,
+        }
+        self.specialty_ids = {
+            "Management": management_role_id,
+            "Society": society_role_id,
+            "Biomedical": biomedical_role_id,
+        }
+        self.TA_role_id = TA_role_id
+        self.upper_year_role_id = upper_year_role_id
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
@@ -149,12 +163,44 @@ class VerifyMe(commands.Cog):
                         data[mac_id]["is_verified"] = 1
                         data[mac_id]["discord_name"] = str(member)
                         data[mac_id]["discord_id"] = str(member.id)
-                        # in server
+
+                        # stream roles
+                        await member.remove_roles(*[guild.get_role(s_id)
+                                for s_id in self.stream_ids.values()])
+                        stream_name = data[mac_id]["stream"]
+                        stream_id = self.stream_ids.get(stream_name)
+                        if not stream_id:
+                            log(f"Failed to get stream role from name \"{stream_name}\"")
+                        else:
+                            stream_role = guild.get_role(stream_id)
+                            await member.add_roles(stream_role)
+
+                        # specialty roles
+                        await member.remove_roles(*[guild.get_role(s_id)
+                                for s_id in self.specialty_ids.values()])
+                        specialty_name = data[mac_id]["specialty"]
+                        if specialty_name: # specialty_name can be None
+                            specialty_id = self.specialty_ids.get(specialty_name)
+                            if not specialty_id:
+                                log(f"Failed to get specialty role from name \"{specialty_name}\"")
+                            else:
+                                specialty_role = guild.get_role(specialty_id)
+                                await member.add_roles(specialty_role)
+
+                        # misc roles
+                        # NOTE: can't differentiate between upper year and TA, so just give TA
+                        TA_role = guild.get_role(self.TA_role_id)
+                        
+                        has_TA_role = TA_role in member.roles
+                        should_have_role = data[mac_id]["is_TA"]
+                        if should_have_role != has_TA_role:
+                            if has_TA_role: await member.remove_roles(TA_role)
+                            else:           await member.add_roles(TA_role)
+
+                        # verified role
                         if unverified_role in member.roles:
                             await member.remove_roles(unverified_role)
                         await member.add_roles(verified_role)
-
-                        # TODO: add other stream specific roles
 
                         await member.send("Success!")
 
@@ -168,7 +214,7 @@ class VerifyMe(commands.Cog):
                     await member.send(embed=EMBED_MACID_ALREADY_REGISTERED)
                 elif data[mac_id]["discord_id"] == member.id:
                     # If MacID matches, but user does not have Verified role for some reason
-                    log(f"{mac_id} tried to verify, but discord id belongs to {member_id}")
+                    log(f"{mac_id} tried to verify, but discord id belongs to {member.id}")
                     await member.send(embed=EMBED_GENERIC_ERROR)
                 
                 return
