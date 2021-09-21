@@ -113,7 +113,7 @@ class RoleAssign(commands.Cog):
 
     async def add_stream(self, payload: RawReactionActionEvent, guild, member):
 
-        role_names = {'SE': "Software Student", 'CE': "Computer Student"}
+        role_names = {'SE': "Software Student", 'CE': "Computer Student", 'ME': "Mechatronics Student"}
 
         role = discord.utils.get(
             guild.roles, name=role_names[payload.emoji.name])
