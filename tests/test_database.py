@@ -77,18 +77,10 @@ class TestDatabase(TestCase):
             db = Database(path=self.target)
 
     def test_from_classlist(self):
-        len1 = 142
-        len2 = 178
-        cl1 = Database.from_classlist(
-            path=os.path.join(self.clist_dir, "2DA4.csv"),
-            stream="Software")
-        cl2 = Database.from_classlist(
-            path=os.path.join(self.clist_dir, "2GA3.csv"),
-            stream="Software")
+        cl1 = Database.from_classlist(path=os.path.join(self.clist_dir, "2DA4.csv"), stream="Software")
+        cl2 = Database.from_classlist(path=os.path.join(self.clist_dir, "2GA3.csv"), stream="Software")
         
-        self.assertEqual(len(cl1), len1)
-        self.assertEqual(len(cl2), len2)
-        self.assertLess(len(set(cl1 + cl2)), len1 + len2)
+        self.assertLess(len(set(cl1 + cl2)), len(cl1) + len(cl2))
         self.assertIn(self.test_user1, cl1)
         self.assertNotIn(self.test_user2, cl1)
 

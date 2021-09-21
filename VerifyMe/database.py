@@ -107,25 +107,28 @@ class Database:
 def main():
     cwd = os.path.dirname(__file__)
     classlists = os.path.join(cwd, "classlists")
-    Database.create_db(
-        path=os.path.join(cwd, "users.db"),
-        users=list(set(
-            Database.from_classlist(
-                path=os.path.join(classlists, "2DA4.csv"),
-                stream="Software") +
-            Database.from_classlist(
-                path=os.path.join(classlists, "2GA3.csv"),
-                stream="Software") +
-            Database.from_classlist(
-                path=os.path.join(classlists, "2DM3.csv"),
-                stream="Software") +
-            Database.from_classlist(
-                path=os.path.join(classlists, "2OP3.csv"),
-                stream="Software") +
-            Database.from_classlist(
-                path=os.path.join(classlists, "2XC3.csv"),
-                stream="Software")
-        )))
+
+    users = {user.macid: user for user in set(
+        Database.from_classlist(path=os.path.join(classlists, "2DA4.csv"), stream="Software") +
+        Database.from_classlist(path=os.path.join(classlists, "2GA3.csv"), stream="Software") +
+        Database.from_classlist(path=os.path.join(classlists, "2DM3.csv"), stream="Software") +
+        Database.from_classlist(path=os.path.join(classlists, "2OP3.csv"), stream="Software") +
+        Database.from_classlist(path=os.path.join(classlists, "2XC3.csv"), stream="Software")
+    )}
+    # for mgmt_user in Database.from_classlist(path=os.path.join(classlists, "....csv"), stream="_"):
+    #     user = users[mgmt_user.macid]
+    #     users[mgmt_user.macid] = Database.UserData.new(
+    #         user.macid, user.full_name, "Management", user.is_TA)
+    # for soc_user in Database.from_classlist(path=os.path.join(classlists, "....csv"), stream="_"):
+    #     user = users[soc_user.macid]
+    #     users[soc_user.macid] = Database.UserData.new(
+    #         user.macid, user.full_name, "Society", user.is_TA)
+    # for bio_user in Database.from_classlist(path=os.path.join(classlists, "....csv"), stream="_"):
+    #     user = users[bio_user.macid]
+    #     users[bio_user.macid] = Database.UserData.new(
+    #         user.macid, user.full_name, "Biomedical", user.is_TA)
+
+    Database.create_db(path=os.path.join(cwd, "users.db"), users=list(users.values()))
 
 if __name__ == '__main__':
     main()
