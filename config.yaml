@@ -22,16 +22,19 @@ upper_year_role_id: 838871312305750047
 TA_role_id: 840665145641402448
 
 role_assign_channel_id: 811325981377429594
-verify_message_id: 841328188398239746
+specialty_mesage_id: 852591939240853504
+stream_message_id: 852591936845512764
+misc_message_id: 852591944118697994
+verify_message_id: 852592043473371177
 
 introductions_channel_id: 811329517184221194
 
-se_emoji_id: -1
-ce_emoji_id: -1
-me_emoji_id: -1
-mg_emoji_id: -1
-sc_emoji_id: -1
-bm_emoji_id: -1
-up_emoji_id: -1
-ta_emoji_id: -1
-check_mark_id: -1
+se_emoji_id: 840654211456565267
+ce_emoji_id: 840654211439001670
+me_emoji_id: 852207616884342825
+mg_emoji_id: 840654969925533716
+sc_emoji_id: 840654969441878027
+bm_emoji_id: 840654969798656020
+up_emoji_id: 840654210940272682
+ta_emoji_id: 840665098888544276
+check_mark_id: 840662085746425946

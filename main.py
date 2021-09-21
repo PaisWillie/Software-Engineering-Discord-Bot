@@ -98,10 +98,10 @@ emoji_ids = {'SE': config["se_emoji_id"],
 bot.add_cog(RoleAssign(
     bot=bot,
     
-    specialty_message_id=config[""],
-    stream_message_id=config[""],
-    misc_message_id=config[""],
-    verify_message_id=config[""],
+    specialty_message_id=config["specialty_mesage_id"],
+    stream_message_id=config["stream_message_id"],
+    misc_message_id=config["misc_message_id"],
+    verify_message_id=config["verify_message_id"],
 
     role_assign_channel=config["role_assign_channel_id"],
     emoji_ids=emoji_ids,
