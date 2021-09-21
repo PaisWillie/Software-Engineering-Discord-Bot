@@ -67,7 +67,10 @@ class RoleAssign(commands.Cog):
 
         # TODO: Check if verified, if so, remove reaction and return None
 
-        if (payload.message_id != self.role_assign_message) or (
+        if (payload.message_id not in [self.specialty_message_id,
+                                       self.stream_message_id,
+                                       self.misc_message_id,
+                                       self.verify_message_id]) or (
                 payload.user_id == self.bot.user.id):
             return
 
@@ -199,7 +202,10 @@ class RoleAssign(commands.Cog):
 
         # TODO: Check if verified, if so, add reaction back and return None
 
-        if payload.message_id != self.role_assign_message:
+        if payload.message_id not in [self.specialty_message_id,
+                                      self.stream_message_id,
+                                      self.misc_message_id,
+                                      self.verify_message_id]:
             return
 
         if payload.user_id == self.bot.user.id:
@@ -226,7 +232,10 @@ class RoleAssign(commands.Cog):
 
         # If member has verified roles, prevent action, re-add reaction and don't do anything
         if verified_role in member.roles:
-            await message.add_reaction(emoji, user)
+            # await message.add_reaction(emoji, user)
+
+            # If verified user unreacts, ignore message 
+            return
 
         elif payload.emoji.name in role_names:
 
