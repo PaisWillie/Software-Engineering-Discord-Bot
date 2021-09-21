@@ -147,6 +147,19 @@ class NQN(commands.Cog):
         if message.author.bot:
             return
 
+        # ignore replies
+        if message.reference:
+            return
+
+        # ignore any mentions
+        if message.channel_mentions or \
+                message.role_mentions or \
+                message.mention_everyone or \
+                message.mentions:
+            return
+        
+        # double pinging and other related problems are bluntly fixed here
+
         parsed_message = self.parse_message(message.content)
 
         if parsed_message:
@@ -155,11 +168,6 @@ class NQN(commands.Cog):
             if not webhook:
                 webhook = await message.channel.create_webhook(name = "NQN")
 
-            # TODO: 
-            # since mentions are not allowed here, some unusual behaviour might
-            # occur if a user mentions or replies to another user and then their
-            # message is deleted. Perhaps this should be accounted for...
-            # if those mentions were allowed, double pinging would be a problem
             await webhook.send(
                 parsed_message,
                 username = message.author.nick if message.author.nick else message.author.name,
