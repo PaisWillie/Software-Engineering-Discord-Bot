@@ -121,18 +121,18 @@ def main():
             users[mgmt_user.macid] = Database.UserData.new(
                 user.macid, user.full_name, user.stream, "Management", user.is_TA)
         except: pass
-    # for soc_user in Database.from_classlist(path=os.path.join(classlists, "....csv"), stream="_"):
-    #     try:
-    #         user = users[soc_user.macid]
-    #         users[soc_user.macid] = Database.UserData.new(
-    #             user.macid, user.full_name, user.stream, "Society", user.is_TA)
-    #     except: pass
-    # for bio_user in Database.from_classlist(path=os.path.join(classlists, "....csv"), stream="_"):
-    #     try:
-    #         user = users[bio_user.macid]
-    #         users[bio_user.macid] = Database.UserData.new(
-    #             user.macid, user.full_name, user.stream, "Biomedical", user.is_TA)
-    #     except: pass
+    for soc_user in Database.from_classlist(path=os.path.join(classlists, "ENGSOCTY_2Y03.csv"), stream="_"):
+        try:
+            user = users[soc_user.macid]
+            users[soc_user.macid] = Database.UserData.new(
+                user.macid, user.full_name, user.stream, "Society", user.is_TA)
+        except: pass
+    for bio_user in Database.from_classlist(path=os.path.join(classlists, "IBEHS_2P03.csv"), stream="_"):
+        try:
+            user = users[bio_user.macid]
+            users[bio_user.macid] = Database.UserData.new(
+                user.macid, user.full_name, user.stream, "Biomedical", user.is_TA)
+        except: pass
 
     Database.create_db(path=os.path.join(cwd, "users.db"), users=list(users.values()))
 
