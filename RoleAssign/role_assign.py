@@ -43,14 +43,11 @@ class RoleAssign(commands.Cog):
 
         channel = self.bot.get_channel(self.role_assign_channel)
 
-        setup_emojis_names = ('SE', 'CE', "BlankI", 'MG', 'SC',
-                              'BM', "BlankII", 'UP', 'TA', "BlankIII", "CheckMark")
-
         setup_emojis_names = {
             self.stream_message_id: ('SE', 'CE', 'ME'),
             self.specialty_message_id: ('MG', 'SC', 'BM'),
             self.misc_message_id: ('UP', 'TA'),
-            self.verify_message_id: ('CheckMark')
+            self.verify_message_id: ('CheckMark',)
         }
 
         for message_id in setup_emojis_names:
@@ -75,15 +72,14 @@ class RoleAssign(commands.Cog):
             return
 
         blanks = ["BlankI", "BlankII", "BlankIII", "CheckMark"]
-        streams = ['SE', 'CE']
+        streams = ['SE', 'CE', 'ME']
         specialties = ['MG', 'SC', 'BM']
         misc = ['UP', 'TA']
 
         guild = self.bot.get_guild(payload.guild_id)
         member = await guild.fetch_member(payload.user_id)
 
-        verified_role = discord.utils.get(
-            guild.roles, name="CheckMark")
+        verified_role = discord.utils.get(guild.roles, name="✔️")
 
         channel = self.bot.get_channel(payload.channel_id)
         emoji = self.bot.get_emoji(self.emoji_ids[payload.emoji.name])
@@ -213,6 +209,7 @@ class RoleAssign(commands.Cog):
 
         role_names = {'SE': "Software Student",
                       'CE': "Computer Student",
+                      'ME': "Mechatronics Student",
                       'MG': "Management",
                       'SC': "Society",
                       'BM': "Biomedical",
@@ -222,8 +219,7 @@ class RoleAssign(commands.Cog):
         guild = self.bot.get_guild(payload.guild_id)
         member = await guild.fetch_member(payload.user_id)
 
-        verified_role = discord.utils.get(
-            guild.roles, name="❌")
+        verified_role = discord.utils.get(guild.roles, name="✔️")
 
         channel = self.bot.get_channel(payload.channel_id)
         emoji = self.bot.get_emoji(self.emoji_ids[payload.emoji.name])
