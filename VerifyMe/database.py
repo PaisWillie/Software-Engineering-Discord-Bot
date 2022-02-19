@@ -16,8 +16,8 @@ class Database:
         is_TA: int
 
         @classmethod
-        def new(cls, macid : str, full_name : str, stream : str, is_TA : int):
-            return cls(macid, full_name, 0, stream, None, None, None, is_TA)
+        def new(cls, macid: str, full_name: str, stream: str, specialty: str, is_TA: int):
+            return cls(macid, full_name, 0, stream, specialty, None, None, is_TA)
 
     DB_KEYS = UserData._fields
     DB_TYPES = ("text", "text", "integer", "text",
@@ -57,7 +57,7 @@ class Database:
             reader = csv.reader(csv_in, delimiter=',', quotechar="\"")
             for _image, full_name, macid, role in reader:
                 is_TA = int(role != "Student")
-                users.append(Database.UserData.new(macid, full_name, stream, is_TA))
+                users.append(Database.UserData.new(macid, full_name, stream, None, is_TA))
         return users
 
     @staticmethod
@@ -115,18 +115,24 @@ def main():
         Database.from_classlist(path=os.path.join(classlists, "2OP3.csv"), stream="Software") +
         Database.from_classlist(path=os.path.join(classlists, "2XC3.csv"), stream="Software")
     )}
-    # for mgmt_user in Database.from_classlist(path=os.path.join(classlists, "....csv"), stream="_"):
-    #     user = users[mgmt_user.macid]
-    #     users[mgmt_user.macid] = Database.UserData.new(
-    #         user.macid, user.full_name, "Management", user.is_TA)
+    for mgmt_user in Database.from_classlist(path=os.path.join(classlists, "ENGNMGT_2AA3.csv"), stream="_"):
+        try:
+            user = users[mgmt_user.macid]
+            users[mgmt_user.macid] = Database.UserData.new(
+                user.macid, user.full_name, user.stream, "Management", user.is_TA)
+        except: pass
     # for soc_user in Database.from_classlist(path=os.path.join(classlists, "....csv"), stream="_"):
-    #     user = users[soc_user.macid]
-    #     users[soc_user.macid] = Database.UserData.new(
-    #         user.macid, user.full_name, "Society", user.is_TA)
+    #     try:
+    #         user = users[soc_user.macid]
+    #         users[soc_user.macid] = Database.UserData.new(
+    #             user.macid, user.full_name, user.stream, "Society", user.is_TA)
+    #     except: pass
     # for bio_user in Database.from_classlist(path=os.path.join(classlists, "....csv"), stream="_"):
-    #     user = users[bio_user.macid]
-    #     users[bio_user.macid] = Database.UserData.new(
-    #         user.macid, user.full_name, "Biomedical", user.is_TA)
+    #     try:
+    #         user = users[bio_user.macid]
+    #         users[bio_user.macid] = Database.UserData.new(
+    #             user.macid, user.full_name, user.stream, "Biomedical", user.is_TA)
+    #     except: pass
 
     Database.create_db(path=os.path.join(cwd, "users.db"), users=list(users.values()))
 
