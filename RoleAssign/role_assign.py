@@ -86,8 +86,13 @@ class RoleAssign(commands.Cog):
         user = await self.bot.fetch_user(payload.user_id)
         message = await channel.fetch_message(payload.message_id)
 
+        # UP and TA are not the same: UP can be opted into at any time
+        # willie if you reading this then idk exactly what you want, but this makes sense to me
+        if payload.emoji.name == 'UP':
+            await self.add_misc(payload, guild, member)
+        
         # If member has verified roles, prevent action; remove reaction and don't do anything
-        if verified_role in member.roles:
+        elif verified_role in member.roles:
             await message.remove_reaction(emoji, user)
 
         # If reacted a blank, remove reaction and return None
