@@ -1,8 +1,8 @@
 discord
 requests
 bs4
-sqlite3
 warnings
 regex
 smtplib
 yaml
+pysqlite3
