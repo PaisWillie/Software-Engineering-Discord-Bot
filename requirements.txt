@@ -3,3 +3,5 @@ requests
 bs4
 regex
 PyYAML
+pysqlite3
+python-dotenv
