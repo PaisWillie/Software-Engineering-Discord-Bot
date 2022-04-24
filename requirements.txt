@@ -2,6 +2,5 @@ discord
 requests
 bs4
 regex
-smtplib
 yaml
 pysqlite3
