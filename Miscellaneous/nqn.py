@@ -171,7 +171,7 @@ class NQN(commands.Cog):
             await webhook.send(
                 parsed_message,
                 username = message.author.nick if message.author.nick else message.author.name,
-                avatar_url = message.author.avatar_url,
+                avatar_url = message.author.avatar,
                 allowed_mentions = AllowedMentions(
                     users = False,
                     everyone = False,

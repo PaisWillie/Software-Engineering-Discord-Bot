@@ -57,6 +57,8 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
+    # FIXME: Hotfix for broken cogs broke when discord.py updated
+    await NQN(bot=bot).on_message(message)
 
     # Ignore messages made by the bot
     if(message.author == bot.user):
