@@ -23,7 +23,7 @@ else:
         config = yaml.load(file, Loader=yaml.FullLoader)
 
 intents = discord.Intents().all()
-bot = Bot(command_prefix=config["bot_prefixes"], intent=intents)
+bot = Bot(command_prefix=config["bot_prefixes"], intents=intents)
 
 
 @bot.event
